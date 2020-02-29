@@ -14,6 +14,7 @@ import java.util.HashMap;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -55,15 +56,18 @@ public class SearchEngine {
                 "can", "will", "just", "don", "don't", "should", "should've", "now", "d", "ll", "m", "re", "ve" }) {
             caset.add(s);
         }
-       
+        // StandardAnalyzer analyzer = new
+        // StandardAnalyzer(EnglishAnalyzer.getDefaultStopSet());
+        // Analyzer analyzer = new EnglishAnalyzer();
         EnglishAnalyzer analyzer = new EnglishAnalyzer(caset);
         return analyzer;
     }
 
     public MultiSimilarity getSimilarity() {
 
-        Similarity[] similarities = { new ClassicSimilarity(), new BM25Similarity()
-        		// , new AxiomaticF1LOG() // reduces map value
+        Similarity[] similarities = { // new ClassicSimilarity(),
+                new BM25Similarity()
+                // , new AxiomaticF1LOG() // reduces map value
                 // , new BooleanSimilarity(), // reduces map value
                 // , new LMJelinekMercerSimilarity(0.2f) // reduces map value
 
@@ -74,15 +78,15 @@ public class SearchEngine {
 
     public void BuildIndex() throws IOException {
         // Basic outline of the process -
-    	// Create Analyzer - for ex. a StandardAnalyzer
+        // Create Analyzer - for ex. a StandardAnalyzer
         // Open a Directory for index
         // Create Index writer config
         // Set up config, open
         // Create index writer
         // Create doc and add fields
-        // Add docs to indexwriter 
+        // Add docs to indexwriter
         // close index writer and doc
-    	
+
         final String cranDocsFilePath = documentsLocation + "/cran.all.1400";
         System.out.println("Reading the master document - " + cranDocsFilePath);
 
@@ -126,7 +130,7 @@ public class SearchEngine {
         try {
             // configurations
             final String queriesFile = this.documentsLocation + "/cran.qry";
-            final String outputFile= this.documentsLocation + "/cranqrel-output";
+            final String outputFile = this.documentsLocation + "/cranqrel-output";
             final int nResults = 1000;
             final FileWriter fileWriter = new FileWriter(outputFile);// +
             // Instant.now().getEpochSecond());
@@ -137,10 +141,9 @@ public class SearchEngine {
             // Open the folder that contains our search index
             final Directory directory = FSDirectory.open(Paths.get(this.indexLocation));
 
-            
             final DirectoryReader ireader = DirectoryReader.open(directory);
             final IndexSearcher isearcher = new IndexSearcher(ireader);
-            
+
             // common similarity and analyzer
             isearcher.setSimilarity(getSimilarity());
 
@@ -182,7 +185,7 @@ public class SearchEngine {
             fileWriter.close();
             System.out.println("QRel file generated.");
             System.out.println("Qrel output in file - " + outputFile);
-            
+
         } catch (final Exception ex) {
             System.out.println(ex.toString());
         }
@@ -246,7 +249,7 @@ public class SearchEngine {
     }
 }
 
-// A class to store the contents of a query or a document temporarily 
+// A class to store the contents of a query or a document temporarily
 class DocumentFragment {
     public int DocIndex;
     public String Title;
